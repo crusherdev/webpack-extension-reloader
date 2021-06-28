@@ -90,9 +90,9 @@ export default class ExtensionReloaderImpl extends AbstractPluginReloader
 
     this._eventAPI = new CompilerEventsFacade(compiler);
     this._injector = middlewareInjector(parsedEntries, {
+      isElectron,
       port,
       reloadPage,
-      isElectron,
     });
     this._triggerer = changesTriggerer(port, reloadPage);
     this._eventAPI.afterOptimizeChunkAssets((comp, chunks) => {

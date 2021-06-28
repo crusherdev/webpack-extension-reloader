@@ -134,7 +134,7 @@
 
   // ======================= Bootstraps the middleware =========================== //
   // @ts-ignore
-  if("<%= host %>" === "true") {
+  if("<%= IS_ELECTRON %>" === "true") {
     return typeof window["CRUSHER_CONTENT_SCRIPT"]
       ? contentScriptWorker()
       : extension.getBackgroundPage() === window ? backgroundWorker(new WebSocket(wsHost)) : extensionPageWorker();
