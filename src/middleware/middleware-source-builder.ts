@@ -10,6 +10,7 @@ import {
 import * as signals from "../utils/signals";
 
 export default function middleWareSourceBuilder({
+  isElectron,
   port,
   reloadPage,
 }: IMiddlewareTemplateParams): Source {
@@ -17,6 +18,7 @@ export default function middleWareSourceBuilder({
 
   return new RawSource(
     tmpl({
+      IS_ELECTRON: isElectron,
       WSHost: `ws://localhost:${port}`,
       config: JSON.stringify({ RECONNECT_INTERVAL, SOCKET_ERR_CODE_REF }),
       polyfillSource: `"||${polyfillSource}"`,

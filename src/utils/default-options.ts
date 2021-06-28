@@ -12,6 +12,7 @@ export default {
     contentScript: DEFAULT_CONTENT_SCRIPT_ENTRY,
     extensionPage: DEFAULT_EXTENSION_PAGE_ENTRY,
   },
+  isElectron: false,
   port: DEFAULT_PORT,
   reloadPage: DEFAULT_RELOAD_PAGE,
 };

@@ -21,6 +21,7 @@ export default (args: object) => {
   const manifest = args[MANIFEST] || null;
 
   const pluginOptions: IPluginOptions = {
+    isElectron: false,
     manifest,
     port,
     reloadPage: !args[NO_PAGE_RELOAD],

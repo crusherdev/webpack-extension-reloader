@@ -6,6 +6,7 @@ declare interface IAction {
 declare type ActionFactory = (payload?: any) => IAction;
 
 declare interface IMiddlewareTemplateParams {
+  isElectron: boolean;
   port: number;
   reloadPage: boolean;
 }
@@ -17,7 +18,7 @@ declare type InjectMiddleware = (
 
 declare type MiddlewareInjector = (
   { background, contentScript, extensionPage }: IEntriesOption,
-  { port, reloadPage }: IMiddlewareTemplateParams,
+  { isElectron, port, reloadPage }: IMiddlewareTemplateParams,
 ) => InjectMiddleware;
 
 declare type Triggerer = (onlyPageChanged: boolean) => Promise<any>;

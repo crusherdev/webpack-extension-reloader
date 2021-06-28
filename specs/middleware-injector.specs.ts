@@ -39,7 +39,7 @@ describe("middleware-injector", () => {
     },
   };
 
-  const templateOpts = { port: 1234, reloadPage: true };
+  const templateOpts = { isElectron: false, port: 1234, reloadPage: true };
 
   const options: IEntriesOption = {
     background: entriesInfo.background.name,

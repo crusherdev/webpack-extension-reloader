@@ -55,7 +55,7 @@
   }
 
   // ======================== Called only on background scripts ============================= //
-  function backgroundWorker(socket: WebSocket) {
+  function backgroundWorker(socket: WebSocket, isElectron = false) {
     runtime.onMessage.addListener((action: IAction, sender) => {
       if (action.type === SIGN_CONNECT) {
         return Promise.resolve(formatter("Connected to Extension Hot Reloader"));
@@ -81,7 +81,11 @@
               ),
             }),
           );
-          runtime.reload();
+          if(isElectron && (window as any).electron) {
+            (window as any).electron.reloadExtension();
+          } else {
+            runtime.reload();
+          }
         });
       } else {
         runtime.sendMessage({ type, payload });
@@ -129,6 +133,13 @@
   }
 
   // ======================= Bootstraps the middleware =========================== //
+  // @ts-ignore
+  if("<%= host %>" === "true") {
+    return typeof window["CRUSHER_CONTENT_SCRIPT"]
+      ? contentScriptWorker()
+      : extension.getBackgroundPage() === window ? backgroundWorker(new WebSocket(wsHost)) : extensionPageWorker();
+  }
+
   runtime.reload
     ? extension.getBackgroundPage() === window ? backgroundWorker(new WebSocket(wsHost)) : extensionPageWorker()
     : contentScriptWorker();

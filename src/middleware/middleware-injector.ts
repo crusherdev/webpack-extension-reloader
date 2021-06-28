@@ -4,9 +4,13 @@ import middleWareSourceBuilder from "./middleware-source-builder";
 
 const middlewareInjector: MiddlewareInjector = (
   { background, contentScript, extensionPage },
-  { port, reloadPage },
+  { isElectron, port, reloadPage },
 ) => {
-  const source: Source = middleWareSourceBuilder({ port, reloadPage });
+  const source: Source = middleWareSourceBuilder({
+    isElectron,
+    port,
+    reloadPage,
+  });
   const sourceFactory: SourceFactory = (...sources): Source =>
     new ConcatSource(...sources);
 

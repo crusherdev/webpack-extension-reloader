@@ -75,7 +75,7 @@ export default class ExtensionReloaderImpl extends AbstractPluginReloader
   }
 
   public _registerPlugin(compiler: Compiler) {
-    const { reloadPage, port, entries, manifest } = merge(
+    const { reloadPage, port, entries, manifest, isElectron } = merge(
       defaultOptions,
       this._opts,
     );
@@ -89,7 +89,11 @@ export default class ExtensionReloaderImpl extends AbstractPluginReloader
       : entries;
 
     this._eventAPI = new CompilerEventsFacade(compiler);
-    this._injector = middlewareInjector(parsedEntries, { port, reloadPage });
+    this._injector = middlewareInjector(parsedEntries, {
+      port,
+      reloadPage,
+      isElectron,
+    });
     this._triggerer = changesTriggerer(port, reloadPage);
     this._eventAPI.afterOptimizeChunkAssets((comp, chunks) => {
       comp.assets = {

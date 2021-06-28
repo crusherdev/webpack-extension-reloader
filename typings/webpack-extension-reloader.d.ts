@@ -3,6 +3,7 @@ import { Compiler } from "webpack";
 export interface IPluginOptions {
   port: number;
   reloadPage: boolean;
+  isElectron: boolean;
   manifest?: string;
   entries?: IEntriesOption;
 }
