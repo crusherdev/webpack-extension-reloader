@@ -135,9 +135,13 @@
   // ======================= Bootstraps the middleware =========================== //
   // @ts-ignore
   if("<%= IS_ELECTRON %>" === "true") {
-    return typeof window["CRUSHER_CONTENT_SCRIPT"]
-      ? contentScriptWorker()
-      : extension.getBackgroundPage() === window ? backgroundWorker(new WebSocket(wsHost)) : extensionPageWorker();
+    if(window["CRUSHER_BACKGROUND_SCRIPT"]) {
+      return backgroundWorker(new WebSocket(wsHost));
+    }
+    if(window["CRUSHER_CONTENT_SCRIPT"]) {
+      return contentScriptWorker();
+    }
+    return extensionPageWorker();
   }
 
   runtime.reload
