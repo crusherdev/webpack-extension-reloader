@@ -6,13 +6,21 @@
 /*  external argument must be provided using it       */
 /* -------------------------------------------------- */
 (function(window) {
-
   const injectionContext = {browser: null};
-  (function() {
-    `<%= polyfillSource %>`;
-  }).bind(injectionContext)();
+  let browser : any = {runtime: {getManifest: () => ""}, extension: null, tabs: null};
 
-  const { browser }: any = injectionContext;
+  // @ts-ignore
+  const IS_ELECTRON = "<%= IS_ELECTRON %>" === "true";
+
+  try {
+    (function() {
+      `<%= polyfillSource %>`;
+    }).bind(injectionContext)();
+    browser = injectionContext.browser;
+  } catch(ex) {
+    if(!IS_ELECTRON) throw ex;
+  }
+
   const signals: any = JSON.parse('<%= signals %>');
   const config: any = JSON.parse('<%= config %>');
 
@@ -81,11 +89,7 @@
               ),
             }),
           );
-          if(isElectron && (window as any).electron) {
-            (window as any).electron.reloadExtension();
-          } else {
-            runtime.reload();
-          }
+          runtime.reload();
         });
       } else {
         runtime.sendMessage({ type, payload });
@@ -132,16 +136,32 @@
     });
   }
 
+  // ======================== Called only on background scripts ============================= //
+  function basicWorker(socket: WebSocket) {
+    socket.addEventListener("message", ({ data }: MessageEvent) => {
+      const { type, payload } = JSON.parse(data);
+
+      const isContentORBackgroundScript = ((window as any)["CRUSHER_CONTENT_SCRIPT"] || (window as any)["CRUSHER_BACKGROUND_SCRIPT"]);
+      if (type === SIGN_CHANGE) {
+        logger("Detected Changes. Reloading ...");
+        if( isContentORBackgroundScript && (!payload || !payload.onlyPageChanged)) {
+          if(IS_ELECTRON && (window as any).electron) {
+            (window as any).electron.reloadExtension();
+          } else {
+            console.error("Can't reload the electron app for some reason. Restart it manually...");
+          }
+        } else {
+          if(!isContentORBackgroundScript && reloadPage && payload && payload.onlyPageChanged) {
+            window.location.reload();
+          }
+        }
+      }
+    });
+  }
+
   // ======================= Bootstraps the middleware =========================== //
-  // @ts-ignore
-  if("<%= IS_ELECTRON %>" === "true") {
-    if(window["CRUSHER_BACKGROUND_SCRIPT"]) {
-      return backgroundWorker(new WebSocket(wsHost));
-    }
-    if(window["CRUSHER_CONTENT_SCRIPT"]) {
-      return contentScriptWorker();
-    }
-    return extensionPageWorker();
+  if(IS_ELECTRON) {
+    return basicWorker(new WebSocket(wsHost));
   }
 
   runtime.reload
